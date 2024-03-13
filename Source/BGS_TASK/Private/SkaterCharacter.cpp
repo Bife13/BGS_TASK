@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+#include "BGS_TASK/Public/SkaterCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -8,7 +9,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "BGS_TASK/Public/SkaterCharacter.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void ASkaterCharacter::Move(const FInputActionValue& Value)
 		MoveForwardValue = FMath::Lerp(MoveForwardValue,MovementValue,.01f);
 		
 		// add movement
-		if(MovementValue > 0)
+		if(MovementValue > 0 && !GetCharacterMovement()->IsFalling())
 			AddMovementInput(SkateMesh->GetRightVector(), MoveForwardValue);
 	}
 }
@@ -118,9 +118,18 @@ void ASkaterCharacter::Turn(const FInputActionValue& Value)
 	// input is a Vector2D
 	TurnValue = Value.Get<float>();
 
+	if(GetCharacterMovement()->IsFalling())
+	{
+		GetCharacterMovement()->RotationRate = {0,350,0};
+	}else
+	{
+		GetCharacterMovement()->RotationRate = {0,100,0};
+	}
+
 	if (Controller != nullptr)
 	{
-		AddMovementInput(SkateMesh->GetForwardVector() * -1, TurnValue * 0.05f);
+		float TurnReduction = 0.02f;
+		AddMovementInput(SkateMesh->GetForwardVector() * -1, TurnValue * TurnReduction);
 	}
 }
 
