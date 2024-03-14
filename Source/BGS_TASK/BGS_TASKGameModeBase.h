@@ -14,4 +14,5 @@ class BGS_TASK_API ABGS_TASKGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+	
 };

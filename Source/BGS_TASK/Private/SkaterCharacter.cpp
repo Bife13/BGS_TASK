@@ -18,7 +18,7 @@ ASkaterCharacter::ASkaterCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -44,7 +44,8 @@ ASkaterCharacter::ASkaterCharacter()
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
@@ -59,12 +60,29 @@ void ASkaterCharacter::BeginPlay()
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
 }
+
+UCharacterMovementComponent* ASkaterCharacter::GetCharacterMovementComponent()
+{
+	return GetCharacterMovement();
+}
+
+float ASkaterCharacter::GetMovementInput()
+{
+	return MovementValue;
+}
+
+float ASkaterCharacter::GetTurnInput()
+{
+	return TurnValue;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -72,11 +90,11 @@ void ASkaterCharacter::BeginPlay()
 void ASkaterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
 		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASkaterCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ASkaterCharacter::StopJumping);
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASkaterCharacter::Move);
@@ -87,9 +105,7 @@ void ASkaterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASkaterCharacter::Look);
-
 	}
-
 }
 
 void ASkaterCharacter::Move(const FInputActionValue& Value)
@@ -99,11 +115,10 @@ void ASkaterCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+		MoveForwardValue = FMath::Lerp(MoveForwardValue, MovementValue, .01f);
 
-		MoveForwardValue = FMath::Lerp(MoveForwardValue,MovementValue,.01f);
-		
 		// add movement
-		if(MovementValue > 0 && !GetCharacterMovement()->IsFalling())
+		if (MovementValue > 0 && !GetCharacterMovement()->IsFalling())
 			AddMovementInput(SkateMesh->GetRightVector(), MoveForwardValue);
 	}
 }
@@ -113,17 +128,29 @@ void ASkaterCharacter::StopMove(const FInputActionValue& Value)
 	MovementValue = 0;
 }
 
+void ASkaterCharacter::Jump(const FInputActionValue& Value)
+{
+	PlayAnimMontage(JumpMontage,1.5);
+	ACharacter::Jump();
+}
+
+void ASkaterCharacter::StopJump(const FInputActionValue& Value)
+{
+	ACharacter::StopJumping();
+}
+
 void ASkaterCharacter::Turn(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	TurnValue = Value.Get<float>();
 
-	if(GetCharacterMovement()->IsFalling())
+	if (GetCharacterMovement()->IsFalling())
 	{
-		GetCharacterMovement()->RotationRate = {0,350,0};
-	}else
+		GetCharacterMovement()->RotationRate = {0, 350, 0};
+	}
+	else
 	{
-		GetCharacterMovement()->RotationRate = {0,100,0};
+		GetCharacterMovement()->RotationRate = {0, 150, 0};
 	}
 
 	if (Controller != nullptr)
@@ -145,7 +172,3 @@ void ASkaterCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
-
-
-
-

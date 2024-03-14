@@ -3,11 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Skating.h"
 #include "SkaterCharacter.generated.h"
 
 
 UCLASS(config=Game)
-class ASkaterCharacter : public ACharacter
+class ASkaterCharacter : public ACharacter, public ISkating
 {
 	GENERATED_BODY()
 
@@ -39,12 +40,6 @@ class ASkaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	UPROPERTY(BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	float MovementValue;
-	
-	UPROPERTY(BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	float TurnValue;
-
 public:
 	ASkaterCharacter();
 	
@@ -57,6 +52,12 @@ protected:
 	/** Called for movement input */
 	void StopMove(const FInputActionValue& Value);
 
+	/** Called for movement input */
+	void Jump(const FInputActionValue& Value);
+
+	/** Called for movement input */
+	void StopJump(const FInputActionValue& Value);
+
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
@@ -66,7 +67,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skate, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* SkateMesh;
 
+	UPROPERTY(BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	float MovementValue;
+	
+	UPROPERTY(BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	float TurnValue;
+	
 	float MoveForwardValue = 0;
+
+	UPROPERTY(EditAnywhere, Category = Animation, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* JumpMontage;
+	
 
 protected:
 	// APawn interface
@@ -74,6 +85,15 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	UFUNCTION(BlueprintCallable)
+	virtual UCharacterMovementComponent* GetCharacterMovementComponent() override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual float GetMovementInput() override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual float GetTurnInput() override;
 
 public:
 	/** Returns CameraBoom subobject **/
