@@ -7,10 +7,8 @@
 #include "SkatingGameMode.h"
 #include "Components/BoxComponent.h"
 
-// Sets default values
 AScoreObject::AScoreObject()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
@@ -19,14 +17,12 @@ AScoreObject::AScoreObject()
 	BoxComponent->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
 void AScoreObject::BeginPlay()
 {
 	Super::BeginPlay();
 	SkatingGameMode = Cast<ASkatingGameMode>(GetWorld()->GetAuthGameMode());
 }
 
-// Called every frame
 void AScoreObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -43,12 +39,10 @@ void AScoreObject::NotifyActorEndOverlap(AActor* OtherActor)
 	Super::NotifyActorEndOverlap(OtherActor);
 	if (CurrentOverlappingActor == OtherActor)
 	{
-		if (ISkating* SkatingInterface = Cast<ISkating>(OtherActor))
+		if (OtherActor->Implements<USkating>())
 		{
-			if (SkatingInterface->GetCharacterMovementComponent()->IsFalling())
-			{
+			if(ISkating::Execute_GetCharacterMovementComponent(OtherActor)->IsFalling())
 				SkatingGameMode->IncreaseScore(ObjectScore);
-			}
 		}
 	}
 }

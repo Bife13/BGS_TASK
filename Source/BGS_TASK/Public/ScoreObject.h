@@ -18,15 +18,11 @@ class BGS_TASK_API AScoreObject : public AActor
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* StaticMesh;
-	
-	
 
 public:	
-	// Sets default values for this actor's properties
 	AScoreObject();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
@@ -39,8 +35,8 @@ protected:
 	float ObjectScore;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 };

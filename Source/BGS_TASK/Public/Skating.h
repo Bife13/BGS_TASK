@@ -7,8 +7,7 @@
 #include "UObject/Interface.h"
 #include "Skating.generated.h"
 
-// This class does not need to be modified.
-UINTERFACE(meta = (CannotImplementInterfaceInBlueprint))
+UINTERFACE(MinimalAPI, Blueprintable)
 class USkating : public UInterface
 {
 	GENERATED_BODY()
@@ -21,13 +20,13 @@ class BGS_TASK_API ISkating
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual UCharacterMovementComponent* GetCharacterMovementComponent() = 0;
-	UFUNCTION(BlueprintCallable)
-	virtual float GetMovementInput() = 0;
-	UFUNCTION(BlueprintCallable)
-	virtual float GetTurnInput() = 0;
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+	UCharacterMovementComponent* GetCharacterMovementComponent();
+	
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent)
+	float GetMovementInput();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	float GetTurnInput();
 };
