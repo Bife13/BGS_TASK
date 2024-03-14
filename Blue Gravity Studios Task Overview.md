@@ -1,4 +1,3 @@
-  Blue Gravity Studios Task Overview
 Utilizing the 3D Third-Person template from UE as a base, I tested some different ways to move
 the character around, in a way that felt right and true to a skateboard, at least somewhat. After a
 while of back and forth of testing and changing values I landed on something that felt decent, it
