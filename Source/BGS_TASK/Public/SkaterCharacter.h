@@ -54,10 +54,7 @@ protected:
 
 	/** Called for movement input */
 	void Jump(const FInputActionValue& Value);
-
-	/** Called for movement input */
-	void StopJump(const FInputActionValue& Value);
-
+	
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 

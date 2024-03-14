@@ -93,8 +93,7 @@ void ASkaterCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ASkaterCharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ASkaterCharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ASkaterCharacter::Jump);
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASkaterCharacter::Move);
@@ -130,13 +129,9 @@ void ASkaterCharacter::StopMove(const FInputActionValue& Value)
 
 void ASkaterCharacter::Jump(const FInputActionValue& Value)
 {
-	PlayAnimMontage(JumpMontage,1.5);
 	ACharacter::Jump();
-}
-
-void ASkaterCharacter::StopJump(const FInputActionValue& Value)
-{
-	ACharacter::StopJumping();
+	if (!GetCharacterMovement()->IsFalling())
+		PlayAnimMontage(JumpMontage, 1.5);
 }
 
 void ASkaterCharacter::Turn(const FInputActionValue& Value)
